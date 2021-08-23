@@ -18,8 +18,6 @@ public interface ContactService {
 	// Get Methods
 	Iterable<PhoneBookUser> getContactByString(String sString);
 
-	//public List<PhoneBookUser> getContacts(List<PhoneBookUser> userContacts) {
-	//public List<PhoneBookUser> getContacts( ) {
 	Iterable<PhoneBookUser> getContacts();
 
 	// Delete Contact

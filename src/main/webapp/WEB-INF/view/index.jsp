@@ -55,6 +55,7 @@
 					     </fieldset>
 					    <button type="submit"  class="pure-button pure-input-1-2 pure-button-primary">
 					    <i class="fa fa-search"></i>Search</button>
+					    <h4>${exceptionMessage}</h4> 
 					</form>
 				</div>
 			</div>

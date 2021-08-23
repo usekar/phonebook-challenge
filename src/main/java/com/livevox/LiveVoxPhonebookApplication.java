@@ -24,21 +24,13 @@ public class LiveVoxPhonebookApplication {
 	}
 	
  /* To do
-  * Put it back in github
-  * 			add clean message to "Added " and not always
-  * 			Search on phone number
-  * 			finish the css issue
-  * 			Write teh interface first
-  *  			* Add logger
-  *  			* Error pages
-  *    			* Add @Transactional to all Service layer methods
+ 
   * add exception handling  
   * scalabality feautures 
   * Add test cases for repository
-  * add test cases for mockito
-  * apply Stringutils to error handle session elements
+  * add test cases for mockito  *  
   * Pagination
-  * Why have SpringBootServletInitializer
+
 
   */
 }

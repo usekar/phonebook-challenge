@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.livevox.exceptions.PhoneBookException;
 import com.livevox.model.PhoneBookUser;
 import com.livevox.service.ContactService;
 
@@ -40,42 +42,39 @@ public class PhoneBookController {
 
 	@GetMapping("/")
 	public String getHomePage(Model model, HttpServletRequest request) {
-		
+
 		HttpSession session = request.getSession();
 		session.setAttribute("Authenticated", Boolean.TRUE);
-	   
+
 		// For today's purposes to simulate Login against AD or IAM roles
 		boolean bAuthenticatedUser = (boolean) session.getAttribute("Authenticated");
-		logger.info("For Demo purposes the flag is set to TRUE for authentication. Change it to False to validate Login message");
-		
+		logger.info(
+				"For Demo purposes the flag is set to TRUE for authentication. Change it to False to validate Login message");
+
 		if (bAuthenticatedUser)
 			return "redirect:/findUser";
 		else {
 			model.addAttribute("message", welcomeMessage + "<BR> You need to Relogin to get access !!");
 		}
-		
+
 		return "index";
 	}
 
-	/*
-	 * @GetMapping("/findUser") public String findContact(Model model) {
-	 * System.out.println("Within the find Contact controller");
-	 * //List<PhoneBookUser> lContacts = contactService.getContacts();
-	 * 
-	 * Iterable<PhoneBookUser> lContacts = contactService.getContacts();
-	 * model.addAttribute("contacts", lContacts);
-	 * 
-	 * return "index"; }
-	 */
-
 	@GetMapping("/findUser")
-	public ModelAndView findContact(@ModelAttribute("id") String sFindStr) {
+	public ModelAndView findContact(@ModelAttribute("id") String sFindStr) throws PhoneBookException {
 		logger.info("Finding the Contacts for " + sFindStr);
 		ModelAndView mvObj = new ModelAndView("index");
 		mvObj.setViewName("index");
 		// List<PhoneBookUser> lContacts = contactService.getContacts();
 		Iterable<PhoneBookUser> lContacts = contactService.getContactByString(sFindStr);
-		mvObj.addObject("contactList", lContacts);
+		
+		if (lContacts.spliterator().getExactSizeIfKnown() > 0 ) {
+			mvObj.addObject("contactList", lContacts); 
+		}
+		else {
+			throw new PhoneBookException();
+		}
+			
 		return mvObj;
 	}
 
@@ -114,4 +113,17 @@ public class PhoneBookController {
 
 		return modelAndView;
 	}
+	
+	@ExceptionHandler(PhoneBookException.class)
+	public ModelAndView handleEmployeeNotFoundException(HttpServletRequest request, Exception ex){
+		logger.error("Requested URL="+request.getRequestURL());
+		logger.error("Exception Raised="+ex);
+		
+		ModelAndView modelAndView = new ModelAndView();
+	    modelAndView.addObject("exception", ex);
+	    modelAndView.addObject("url", request.getRequestURL());
+	    modelAndView.addObject("exceptionMessage",   " <H2> " + ex.getLocalizedMessage() + " </H2>");
+	    modelAndView.setViewName("index");
+	    return modelAndView;
+	}	
 }
